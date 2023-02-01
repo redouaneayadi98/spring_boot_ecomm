@@ -70,6 +70,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Saving new Product");
         Product product=dtoMapper.fromProductDTO(productDTO);
         product.setCategory(category);
+        product.setPhotoName("unknown.png");
         Product savedProduct=productRepository.save(product);
         return dtoMapper.fromProduct(savedProduct);
     }
@@ -88,6 +89,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Updating Product");
         Product product=dtoMapper.fromProductDTO(productDTO);
         product.setCategory(product2.getCategory());
+        product.setPhotoName("unknown.png");
         Product savedProduct=productRepository.save(product);
         return dtoMapper.fromProduct(savedProduct);
     }

@@ -6,8 +6,12 @@ import com.ecomm_backend.exceptions.CategoryNotFoundException;
 import com.ecomm_backend.exceptions.ProductNotFoundException;
 import com.ecomm_backend.services.ProductServiceImpl;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 @AllArgsConstructor
@@ -93,5 +97,11 @@ public class ProductController {
             @RequestParam(name = "size",defaultValue = "5") int size
     ){
         return productService.productsInPromotion(page,size);
+    }
+    //get photo of product
+    @GetMapping(value = "/products/photo/{id}",produces = MediaType.IMAGE_PNG_VALUE)
+    public byte[] getPhotoProduct(@PathVariable Long id) throws ProductNotFoundException, IOException {
+        ProductDTO p= productService.getProduct(id);
+        return Files.readAllBytes(Paths.get(System.getProperty("user.home")+"/ecom/products/"+p.getPhotoName()));
     }
 }
