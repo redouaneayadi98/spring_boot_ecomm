@@ -43,7 +43,8 @@ public class EcommBackendApplication {
                         throw new RuntimeException(e);
                     }
                     });
-/*            System.out.println("all products "+productService.products(0,5));
+/*          to check
+            System.out.println("all products "+productService.products(0,5));
             System.out.println("products by category "+productService.productsByCategory(1L,0,5));
             System.out.println("products by name "+productService.productsByName("prod",0,5));
             System.out.println("products in promotion "+productService.productsInPromotion(0,5));
