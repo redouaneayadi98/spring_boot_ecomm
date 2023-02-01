@@ -27,13 +27,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
     private ProductMapperImpl dtoMapper;
 
-    //*************category*************//
-    @Override
-    public List<CategoryDTO> getCategoryDTOS() {
-        return categoryRepository.findAll().stream()
-                .map(category-> dtoMapper.fromCategory(category))
-                .collect(Collectors.toList());
-    }
+    /*************** Category ***************/
+    //save new category
     @Override
     public CategoryDTO saveCategory(CategoryDTO categoryDTO) {
         log.info("Saving new Category");
@@ -41,7 +36,8 @@ public class ProductServiceImpl implements ProductService {
         Category savedCategory=categoryRepository.save(category);
         return dtoMapper.fromCategory(savedCategory);
     }
-
+    //update category
+    @Override
     public CategoryDTO updateCategory(CategoryDTO categoryDTO) throws CategoryNotFoundException {
         categoryRepository.findById(categoryDTO.getId())
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
@@ -50,42 +46,23 @@ public class ProductServiceImpl implements ProductService {
         Category savedCategory=categoryRepository.save(category);
         return dtoMapper.fromCategory(savedCategory);
     }
-
+    //delete category
+    @Override
     public void deleteCategory(Long categoryId) throws CategoryNotFoundException {
-            categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
-            categoryRepository.deleteById(categoryId);
-    }
-    //************product*************//
-    @Override
-    public List<ProductDTO> products(int page,int size) {
-        return productRepository.findAll(PageRequest.of(page,size)).stream()
-                .map(product-> dtoMapper.fromProduct(product))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ProductDTO> productsByName(String productName,int page,int size) {
-        return productRepository.findProductsByNameContains(productName,PageRequest.of(page,size)).stream()
-                .map(product-> dtoMapper.fromProduct(product))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ProductDTO> productsByCategory(Long categoryId,int page,int size) throws CategoryNotFoundException {
         categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
-        return productRepository.findProductsByCategory_Id(categoryId,PageRequest.of(page,size)).stream()
-                .map(product-> dtoMapper.fromProduct(product))
-                .collect(Collectors.toList());
+        categoryRepository.deleteById(categoryId);
     }
+    //get all categories
     @Override
-    public List<ProductDTO> productsInPromotion(int page,int size){
-        return productRepository.findProductsByPromotionIsTrue(PageRequest.of(page,size)).stream()
-                .map(product-> dtoMapper.fromProduct(product))
+    public List<CategoryDTO> getCategoryDTOS() {
+        return categoryRepository.findAll().stream()
+                .map(category-> dtoMapper.fromCategory(category))
                 .collect(Collectors.toList());
     }
 
+    //************product*************//
+    //save new product
     @Override
     public ProductDTO saveProduct(ProductDTO productDTO) throws CategoryNotFoundException {
         Category category= categoryRepository.findById(productDTO.getCategoryId())
@@ -96,14 +73,14 @@ public class ProductServiceImpl implements ProductService {
         Product savedProduct=productRepository.save(product);
         return dtoMapper.fromProduct(savedProduct);
     }
-
+    //get product by id
     @Override
     public ProductDTO getProduct(Long productID) throws ProductNotFoundException {
         Product product=productRepository.findById(productID)
                 .orElseThrow(()->new ProductNotFoundException("Product not found"));
         return dtoMapper.fromProduct(product);
     }
-
+    //update product
     @Override
     public ProductDTO updateProduct(ProductDTO productDTO) throws ProductNotFoundException {
         Product product2= productRepository.findById(productDTO.getId())
@@ -114,10 +91,41 @@ public class ProductServiceImpl implements ProductService {
         Product savedProduct=productRepository.save(product);
         return dtoMapper.fromProduct(savedProduct);
     }
+    //delete product
     @Override
     public void deleteProduct(Long productID) throws ProductNotFoundException {
         productRepository.findById(productID)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found"));
         productRepository.deleteById(productID);
+    }
+    //get all products
+    @Override
+    public List<ProductDTO> getProducts(int page,int size) {
+        return productRepository.findAll(PageRequest.of(page,size)).stream()
+                .map(product-> dtoMapper.fromProduct(product))
+                .collect(Collectors.toList());
+    }
+    //search products by keyword
+    @Override
+    public List<ProductDTO> productsByKeyword(String productName,int page,int size) {
+        return productRepository.findProductsByNameContains(productName,PageRequest.of(page,size)).stream()
+                .map(product-> dtoMapper.fromProduct(product))
+                .collect(Collectors.toList());
+    }
+    //search products by category
+    @Override
+    public List<ProductDTO> productsByCategory(Long categoryId,int page,int size) throws CategoryNotFoundException {
+        categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
+        return productRepository.findProductsByCategory_Id(categoryId,PageRequest.of(page,size)).stream()
+                .map(product-> dtoMapper.fromProduct(product))
+                .collect(Collectors.toList());
+    }
+    //search products in promotion
+    @Override
+    public List<ProductDTO> productsInPromotion(int page,int size){
+        return productRepository.findProductsByPromotionIsTrue(PageRequest.of(page,size)).stream()
+                .map(product-> dtoMapper.fromProduct(product))
+                .collect(Collectors.toList());
     }
 }

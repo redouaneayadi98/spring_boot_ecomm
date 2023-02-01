@@ -39,47 +39,46 @@ public class ProductController {
         productService.deleteCategory(categoryId);
     }
     /*************** Product ***************/
+    //save new product
+    @PostMapping("/products")
+    public ProductDTO saveProduct(@RequestBody ProductDTO productDTO) throws CategoryNotFoundException {
+        return productService.saveProduct(productDTO);
+    }
     //get product by id
     @GetMapping("/products/{productId}")
     public ProductDTO getProduct(@PathVariable Long productId) throws ProductNotFoundException {
         return productService.getProduct(productId);
     }
-    //create new product
-    @PostMapping("/products")
-    public ProductDTO createProduct(@RequestBody ProductDTO productDTO) throws CategoryNotFoundException {
-        return productService.saveProduct(productDTO);
-    }
-    //update category
+    //update product
     @PutMapping("/products/{productId}")
     public ProductDTO updateProduct(@PathVariable Long productId,@RequestBody ProductDTO productDTO) throws ProductNotFoundException {
         productDTO.setId(productId);
         return productService.updateProduct(productDTO);
     }
-    //delete category
+    //delete product
     @DeleteMapping("/products/{productId}")
     public void deleteProduct(@PathVariable Long productId) throws ProductNotFoundException {
         productService.deleteProduct(productId);
     }
-    /*************** find Products ***************/
     //get all products
     @GetMapping("/products")
-    public List<ProductDTO> products(
+    public List<ProductDTO> getProducts(
             @RequestParam(name="page",defaultValue = "0") int page,
             @RequestParam(name = "size",defaultValue = "5") int size
             ){
-        return productService.products(page,size);
+        return productService.getProducts(page,size);
     }
-    //get products by their name
-    @GetMapping("/products/by-name")
-    public List<ProductDTO> productsByName(
+    //search products by keyword
+    @GetMapping("/products/search/by-keyword")
+    public List<ProductDTO> productsByKeyword(
             @RequestParam(name="keyword",defaultValue = "") String keyword,
             @RequestParam(name="page",defaultValue = "0") int page,
             @RequestParam(name = "size",defaultValue = "5") int size
     ){
-        return productService.productsByName(keyword,page,size);
+        return productService.productsByKeyword(keyword,page,size);
     }
-    //get products by their category
-    @GetMapping("/products/by-category")
+    //search products by category
+    @GetMapping("/products/search/by-category")
     public List<ProductDTO> productsByCategory(
             @RequestParam(name="categoryId",defaultValue = "1") Long categoryId,
             @RequestParam(name="page",defaultValue = "0") int page,
@@ -87,8 +86,8 @@ public class ProductController {
     ) throws CategoryNotFoundException {
         return productService.productsByCategory(categoryId,page,size);
     }
-    //get products in promotion
-    @GetMapping("/products/in-promotion")
+    //search products in promotion
+    @GetMapping("/products/search/in-promotion")
     public List<ProductDTO> productsInPromotion(
             @RequestParam(name="page",defaultValue = "0") int page,
             @RequestParam(name = "size",defaultValue = "5") int size
