@@ -98,7 +98,7 @@ public class ProductController {
     ){
         return productService.productsInPromotion(page,size);
     }
-    //get photo of product
+    //get photo of product by id
     @GetMapping(value = "/products/photo/{id}",produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getPhotoProduct(@PathVariable Long id) throws ProductNotFoundException, IOException {
         ProductDTO p= productService.getProduct(id);
