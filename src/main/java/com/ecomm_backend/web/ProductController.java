@@ -106,7 +106,7 @@ public class ProductController {
         ProductDTO p= productService.getProduct(id);
         return Files.readAllBytes(Paths.get(System.getProperty("user.home")+"/ecom/products/"+p.getPhotoName()));
     }
-
+    //upload photo of product
     @PostMapping(path = "/products/uploadPhoto/{id}")
     public void uploadPhotoProduct(MultipartFile file, @PathVariable Long id) throws ProductNotFoundException,IOException{
         ProductDTO p= productService.getProduct(id);
