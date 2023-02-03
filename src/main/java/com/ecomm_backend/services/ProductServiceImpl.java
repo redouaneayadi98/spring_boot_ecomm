@@ -2,6 +2,7 @@ package com.ecomm_backend.services;
 
 import com.ecomm_backend.dtos.CategoryDTO;
 import com.ecomm_backend.dtos.ProductDTO;
+import com.ecomm_backend.dtos.ProductPageDTO;
 import com.ecomm_backend.entities.Category;
 import com.ecomm_backend.entities.Product;
 import com.ecomm_backend.exceptions.CategoryNotFoundException;
@@ -11,6 +12,7 @@ import com.ecomm_backend.repositoreis.CategoryRepository;
 import com.ecomm_backend.repositoreis.ProductRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,32 +104,60 @@ public class ProductServiceImpl implements ProductService {
     }
     //get all products
     @Override
-    public List<ProductDTO> getProducts(int page,int size) {
-        return productRepository.findAll(PageRequest.of(page,size)).stream()
+    public ProductPageDTO getProducts(int page, int size) {
+        Page<Product> products= productRepository.findAll(PageRequest.of(page,size));
+        List<ProductDTO> productDTOS=products.stream()
                 .map(product-> dtoMapper.fromProduct(product))
                 .collect(Collectors.toList());
+        ProductPageDTO productPageDTO=new ProductPageDTO();
+        productPageDTO.setCurrentPage(page);
+        productPageDTO.setPageSize(size);
+        productPageDTO.setTotalPages(products.getTotalPages());
+        productPageDTO.setProductDTOS(productDTOS);
+        return productPageDTO;
     }
     //search products by keyword
     @Override
-    public List<ProductDTO> productsByKeyword(String productName,int page,int size) {
-        return productRepository.findProductsByNameContains(productName,PageRequest.of(page,size)).stream()
+    public ProductPageDTO productsByKeyword(String productName, int page, int size) {
+        Page<Product> products= productRepository.findProductsByNameContains(productName,PageRequest.of(page,size));
+        List<ProductDTO> productDTOS=products.stream()
                 .map(product-> dtoMapper.fromProduct(product))
                 .collect(Collectors.toList());
+        ProductPageDTO productPageDTO=new ProductPageDTO();
+        productPageDTO.setCurrentPage(page);
+        productPageDTO.setPageSize(size);
+        productPageDTO.setTotalPages(products.getTotalPages());
+        productPageDTO.setProductDTOS(productDTOS);
+        return productPageDTO;
     }
     //search products by category
     @Override
-    public List<ProductDTO> productsByCategory(Long categoryId,int page,int size) throws CategoryNotFoundException {
+    public ProductPageDTO productsByCategory(Long categoryId, int page, int size) throws CategoryNotFoundException {
         categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
-        return productRepository.findProductsByCategory_Id(categoryId,PageRequest.of(page,size)).stream()
+        Page<Product> products= productRepository.findProductsByCategory_Id(categoryId,PageRequest.of(page,size));
+        List<ProductDTO> productDTOS=products.stream()
                 .map(product-> dtoMapper.fromProduct(product))
                 .collect(Collectors.toList());
+        ProductPageDTO productPageDTO=new ProductPageDTO();
+        productPageDTO.setCurrentPage(page);
+        productPageDTO.setPageSize(size);
+        productPageDTO.setTotalPages(products.getTotalPages());
+        productPageDTO.setProductDTOS(productDTOS);
+        return productPageDTO;
     }
     //search products in promotion
     @Override
-    public List<ProductDTO> productsInPromotion(int page,int size){
-        return productRepository.findProductsByPromotionIsTrue(PageRequest.of(page,size)).stream()
+    public ProductPageDTO productsInPromotion(int page, int size){
+        Page<Product> products= productRepository.findProductsByPromotionIsTrue(PageRequest.of(page,size));
+        List<ProductDTO> productDTOS=products.stream()
                 .map(product-> dtoMapper.fromProduct(product))
                 .collect(Collectors.toList());
+        ProductPageDTO productPageDTO=new ProductPageDTO();
+        productPageDTO.setCurrentPage(page);
+        productPageDTO.setPageSize(size);
+        productPageDTO.setTotalPages(products.getTotalPages());
+        productPageDTO.setProductDTOS(productDTOS);
+        return productPageDTO;
     }
 }

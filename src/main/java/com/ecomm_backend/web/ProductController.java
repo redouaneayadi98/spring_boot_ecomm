@@ -2,12 +2,14 @@ package com.ecomm_backend.web;
 
 import com.ecomm_backend.dtos.CategoryDTO;
 import com.ecomm_backend.dtos.ProductDTO;
+import com.ecomm_backend.dtos.ProductPageDTO;
 import com.ecomm_backend.exceptions.CategoryNotFoundException;
 import com.ecomm_backend.exceptions.ProductNotFoundException;
 import com.ecomm_backend.services.ProductServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -66,7 +68,7 @@ public class ProductController {
     }
     //get all products
     @GetMapping("/products")
-    public List<ProductDTO> getProducts(
+    public ProductPageDTO getProducts(
             @RequestParam(name="page",defaultValue = "0") int page,
             @RequestParam(name = "size",defaultValue = "5") int size
             ){
@@ -74,7 +76,7 @@ public class ProductController {
     }
     //search products by keyword
     @GetMapping("/products/search/by-keyword")
-    public List<ProductDTO> productsByKeyword(
+    public ProductPageDTO productsByKeyword(
             @RequestParam(name="keyword",defaultValue = "") String keyword,
             @RequestParam(name="page",defaultValue = "0") int page,
             @RequestParam(name = "size",defaultValue = "5") int size
@@ -83,7 +85,7 @@ public class ProductController {
     }
     //search products by category
     @GetMapping("/products/search/by-category")
-    public List<ProductDTO> productsByCategory(
+    public ProductPageDTO productsByCategory(
             @RequestParam(name="categoryId",defaultValue = "1") Long categoryId,
             @RequestParam(name="page",defaultValue = "0") int page,
             @RequestParam(name = "size",defaultValue = "5") int size
@@ -92,16 +94,25 @@ public class ProductController {
     }
     //search products in promotion
     @GetMapping("/products/search/in-promotion")
-    public List<ProductDTO> productsInPromotion(
+    public ProductPageDTO productsInPromotion(
             @RequestParam(name="page",defaultValue = "0") int page,
             @RequestParam(name = "size",defaultValue = "5") int size
     ){
         return productService.productsInPromotion(page,size);
     }
     //get photo of product by id
-    @GetMapping(value = "/products/photo/{id}",produces = MediaType.IMAGE_PNG_VALUE)
+    @GetMapping(path = "/products/photo/{id}",produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getPhotoProduct(@PathVariable Long id) throws ProductNotFoundException, IOException {
         ProductDTO p= productService.getProduct(id);
         return Files.readAllBytes(Paths.get(System.getProperty("user.home")+"/ecom/products/"+p.getPhotoName()));
+    }
+
+    @PostMapping(path = "/products/uploadPhoto/{id}")
+    public void uploadPhotoProduct(MultipartFile file, @PathVariable Long id) throws ProductNotFoundException,IOException{
+        ProductDTO p= productService.getProduct(id);
+        p.setPhotoName(id+".png");
+        Files.write(Paths.get(System.getProperty("user.home") + "/ecom/products/" + p.getPhotoName()),file.getBytes());
+        productService.updateProduct(p);
+
     }
 }
