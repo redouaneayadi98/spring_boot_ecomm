@@ -107,12 +107,11 @@ public class ProductController {
         return Files.readAllBytes(Paths.get(System.getProperty("user.home")+"/ecom/products/"+p.getPhotoName()));
     }
     //upload photo of product
-    @PostMapping(path = "/products/uploadPhoto/{id}")
+    @PostMapping(path = "/products/uploadPhoto/{id}",consumes = MediaType.IMAGE_PNG_VALUE)
     public void uploadPhotoProduct(MultipartFile file, @PathVariable Long id) throws ProductNotFoundException,IOException{
         ProductDTO p= productService.getProduct(id);
         p.setPhotoName(id+".png");
         Files.write(Paths.get(System.getProperty("user.home") + "/ecom/products/" + p.getPhotoName()),file.getBytes());
         productService.updateProduct(p);
-
     }
 }
