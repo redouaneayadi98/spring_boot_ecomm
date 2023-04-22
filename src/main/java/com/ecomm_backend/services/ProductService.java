@@ -13,6 +13,8 @@ public interface ProductService{
     /*************** Category ***************/
     //save new category
     CategoryDTO saveCategory(CategoryDTO categoryDTO);
+    //get category by id
+    CategoryDTO getCategory(Long id) throws CategoryNotFoundException;
     //update category
     CategoryDTO updateCategory(CategoryDTO categoryDTO) throws CategoryNotFoundException;
     //delete product

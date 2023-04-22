@@ -16,6 +16,7 @@ public class Category {
     @NotNull
     private String name;
     private String description;
+    private String photoName;
     @OneToMany(mappedBy = "category",fetch = FetchType.LAZY)
     private List<Product> products;
 }

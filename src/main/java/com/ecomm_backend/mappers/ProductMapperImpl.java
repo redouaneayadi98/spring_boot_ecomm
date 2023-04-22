@@ -12,6 +12,8 @@ public class ProductMapperImpl {
     public ProductDTO fromProduct(Product product){
         ProductDTO productDTO=new ProductDTO();
         BeanUtils.copyProperties(product,productDTO);
+        productDTO.setCategoryId(product.getCategory().getId());
+        productDTO.setCategoryName(product.getCategory().getName());
         return productDTO;
     }
     public Product fromProductDTO(ProductDTO productDTO){

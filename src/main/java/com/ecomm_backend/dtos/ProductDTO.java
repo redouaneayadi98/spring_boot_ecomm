@@ -14,5 +14,6 @@ public class ProductDTO {
     private String photoName;
     private int promotionRate;
     private Long CategoryId;
+    private String CategoryName;
     private List<String> color ;
 }

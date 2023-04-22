@@ -20,8 +20,9 @@ public class EcommBackendApplication {
     @Bean
     CommandLineRunner start(
             ProductServiceImpl productService
-    ){
+            ){
         return args -> {
+
             Stream.of("Sport","Books","Info").forEach(name->{
                 CategoryDTO categoryDTO=new CategoryDTO();
                 categoryDTO.setName(name);

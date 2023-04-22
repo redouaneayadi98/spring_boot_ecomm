@@ -35,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
     public CategoryDTO saveCategory(CategoryDTO categoryDTO) {
         log.info("Saving new Category");
         Category category=dtoMapper.fromCategoryDTO(categoryDTO);
+        category.setPhotoName("unknown.png");
         Category savedCategory=categoryRepository.save(category);
         return dtoMapper.fromCategory(savedCategory);
     }
@@ -61,6 +62,13 @@ public class ProductServiceImpl implements ProductService {
         return categoryRepository.findAll().stream()
                 .map(category-> dtoMapper.fromCategory(category))
                 .collect(Collectors.toList());
+    }
+    //get category by id
+    @Override
+    public CategoryDTO getCategory(Long id) throws CategoryNotFoundException {
+        Category category= categoryRepository.findById(id)
+                .orElseThrow(()->new CategoryNotFoundException("Category not found"));
+        return dtoMapper.fromCategory(category);
     }
 
     //************product*************//
@@ -91,7 +99,6 @@ public class ProductServiceImpl implements ProductService {
         log.info("Updating Product");
         Product product=dtoMapper.fromProductDTO(productDTO);
         product.setCategory(product2.getCategory());
-        product.setPhotoName("unknown.png");
         Product savedProduct=productRepository.save(product);
         return dtoMapper.fromProduct(savedProduct);
     }
@@ -106,29 +113,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductPageDTO getProducts(int page, int size) {
         Page<Product> products= productRepository.findAll(PageRequest.of(page,size));
-        List<ProductDTO> productDTOS=products.stream()
-                .map(product-> dtoMapper.fromProduct(product))
-                .collect(Collectors.toList());
-        ProductPageDTO productPageDTO=new ProductPageDTO();
-        productPageDTO.setCurrentPage(page);
-        productPageDTO.setPageSize(size);
-        productPageDTO.setTotalPages(products.getTotalPages());
-        productPageDTO.setProductDTOS(productDTOS);
-        return productPageDTO;
+        return productsPage(products, page, size);
     }
     //search products by keyword
     @Override
     public ProductPageDTO productsByKeyword(String productName, int page, int size) {
         Page<Product> products= productRepository.findProductsByNameContains(productName,PageRequest.of(page,size));
-        List<ProductDTO> productDTOS=products.stream()
-                .map(product-> dtoMapper.fromProduct(product))
-                .collect(Collectors.toList());
-        ProductPageDTO productPageDTO=new ProductPageDTO();
-        productPageDTO.setCurrentPage(page);
-        productPageDTO.setPageSize(size);
-        productPageDTO.setTotalPages(products.getTotalPages());
-        productPageDTO.setProductDTOS(productDTOS);
-        return productPageDTO;
+        return productsPage(products, page, size);
     }
     //search products by category
     @Override
@@ -136,20 +127,16 @@ public class ProductServiceImpl implements ProductService {
         categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
         Page<Product> products= productRepository.findProductsByCategory_Id(categoryId,PageRequest.of(page,size));
-        List<ProductDTO> productDTOS=products.stream()
-                .map(product-> dtoMapper.fromProduct(product))
-                .collect(Collectors.toList());
-        ProductPageDTO productPageDTO=new ProductPageDTO();
-        productPageDTO.setCurrentPage(page);
-        productPageDTO.setPageSize(size);
-        productPageDTO.setTotalPages(products.getTotalPages());
-        productPageDTO.setProductDTOS(productDTOS);
-        return productPageDTO;
+        return productsPage(products, page, size);
     }
     //search products in promotion
     @Override
     public ProductPageDTO productsInPromotion(int page, int size){
         Page<Product> products= productRepository.findProductsByPromotionIsTrue(PageRequest.of(page,size));
+        return productsPage(products, page, size);
+    }
+    //function that transform products to productPageDTO
+    public ProductPageDTO productsPage(Page<Product> products , int page, int size){
         List<ProductDTO> productDTOS=products.stream()
                 .map(product-> dtoMapper.fromProduct(product))
                 .collect(Collectors.toList());
