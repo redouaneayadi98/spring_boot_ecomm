@@ -9,6 +9,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 @SpringBootApplication
@@ -22,6 +26,27 @@ public class EcommBackendApplication {
             ProductServiceImpl productService
             ){
         return args -> {
+
+            try {
+                Path categories = Paths.get("./images/categories/");
+                Path products = Paths.get("./images/products/");
+                Files.createDirectories(categories);
+                Files.createDirectories(products);
+
+                System.out.println("Directory is created!");
+
+            } catch (IOException e) {
+                System.err.println("Failed to create directory!" + e.getMessage());
+            }
+
+            try {
+                Files.write(Paths.get("./images/categories/unknown.png" ),new byte[1]);
+                Files.write(Paths.get("./images/products/unknown.png" ),new byte[1]);
+
+            }catch (IOException e){
+                System.out.println("Failed to save images! "+ e.getMessage());
+            }
+
 
             Stream.of("Sport","Books","Info").forEach(name->{
                 CategoryDTO categoryDTO=new CategoryDTO();
@@ -44,14 +69,6 @@ public class EcommBackendApplication {
                         throw new RuntimeException(e);
                     }
                     });
-/*          to check
-            System.out.println("all products "+productService.products(0,5));
-            System.out.println("products by category "+productService.productsByCategory(1L,0,5));
-            System.out.println("products by name "+productService.productsByName("prod",0,5));
-            System.out.println("products in promotion "+productService.productsInPromotion(0,5));
-            System.out.println("all categories "+productService.getCategoryDTOS());
-            System.out.println("product by id "+productService.getProduct(2L));
-            System.out.println();*/
         };
     }
 }
